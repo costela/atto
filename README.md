@@ -22,9 +22,10 @@ Basically none, but it can and will gladly serve static files. It does not (and 
 
 Nevertheless, it does have the basics:
 
-- optional directory listing (inherited from `http.FileServer`; see `--showlist` below)
-- handle running under some folder under `/` (see `--prefix` below).
-- graceful shutdown to avoid disrupting connection during deployment (see `--timeout.shutdown` below)
+- optional directory listing (inherited from `http.FileServer`; see `--showlist` option)
+- optional transparent compression of content (see `--compress` option)
+- handle running under some folder below `/` (see `--prefix` option)
+- graceful shutdown to avoid disrupting long-running connections during deployment (see `--timeout.shutdown` option)
 
 ## Configuration
 
@@ -32,6 +33,7 @@ The following settings may be provided as command line arguments or environment 
 
 | Flag | Env-Var | Description | Default |
 | --- | --- | --- | --- |
+| `--compress` | `ATTO_COMPRESS` | whether to transparently compress served files | `true` |
 | `--loglevel`, `-l` | `ATTO_LOGLEVEL` | level of logging output (any value supported by [logrus](https://github.com/sirupsen/logrus)) | `warn` |
 | `--port` | `ATTO_PORT` | TCP port on which to listen | `8080` |
 | `--path` | `ATTO_PATH` | path which will be served | `/www` |

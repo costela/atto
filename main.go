@@ -11,6 +11,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/nytimes/gziphandler"
+
 	"github.com/sirupsen/logrus"
 	"github.com/stevenroose/gonfig"
 )
@@ -25,6 +27,7 @@ var conf = struct {
 	Path     string `default:"/www" desc:"path to serve"`
 	Prefix   string `default:"" desc:"prefix under which atto will be accessed (this will be stripped before accessing 'path')"`
 	ShowList bool   `default:"false" desc:"whether to display folder contents"`
+	Compress bool   `default:"true" desc:"whether to transparently compress served files"`
 	Timeout  struct {
 		ReadHeader *duration `default:"5s" desc:"time to wait for request headers"`
 		Shutdown   *duration `default:"30s" desc:"time to wait for ungoing requests to finish before shutting down"`
@@ -50,9 +53,13 @@ func main() {
 	logger.WithField("version", version).Debugf("starting atto")
 
 	logger.Debugf("instantiating server for path %s", conf.Path)
+	handler := http.StripPrefix(conf.Prefix, http.FileServer(safeDir(conf.Path)))
+	if conf.Compress {
+		handler = gziphandler.GzipHandler(handler)
+	}
 	server := http.Server{
 		Addr:              fmt.Sprintf(":%d", conf.Port),
-		Handler:           http.StripPrefix(conf.Prefix, http.FileServer(safeDir(conf.Path))),
+		Handler:           handler,
 		ReadHeaderTimeout: time.Duration(*conf.Timeout.ReadHeader),
 		ReadTimeout:       time.Duration(*conf.Timeout.ReadHeader), // we do not expect any content upload, so headers are enough
 		ErrorLog:          log.New(logger.WithField("source", "http.Server").WriterLevel(logrus.WarnLevel), "", 0),
