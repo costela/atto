@@ -1,5 +1,5 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/costela/atto)](https://goreportcard.com/report/github.com/costela/atto)
-[![Docker Hub Version](https://img.shields.io/badge/dynamic/json.svg?label=docker%20hub&url=https%3A%2F%2Findex.docker.io%2Fv1%2Frepositories%2Fcostela%2Fatto%2Ftags&query=%24[-1:].name&colorB=green)](https://hub.docker.com/costela/atto)
+[![Docker Hub Version](https://img.shields.io/badge/dynamic/json.svg?label=docker%20hub&url=https%3A%2F%2Findex.docker.io%2Fv1%2Frepositories%2Fcostela%2Fatto%2Ftags&query=%24[-1:].name&colorB=green)](https://hub.docker.com/r/costela/atto)
 
 # atto - 10⁻¹⁸ × webserver
 
