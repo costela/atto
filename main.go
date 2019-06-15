@@ -59,7 +59,7 @@ func main() {
 	}
 	server := http.Server{
 		Addr:              fmt.Sprintf(":%d", conf.Port),
-		Handler:           handler,
+		Handler:           logHandler{handler},
 		ReadHeaderTimeout: time.Duration(*conf.Timeout.ReadHeader),
 		ReadTimeout:       time.Duration(*conf.Timeout.ReadHeader), // we do not expect any content upload, so headers are enough
 		ErrorLog:          log.New(logger.WithField("source", "http.Server").WriterLevel(logrus.WarnLevel), "", 0),
@@ -86,6 +86,15 @@ func main() {
 	}()
 
 	wg.Wait()
+}
+
+type logHandler struct {
+	inner http.Handler
+}
+
+func (lh logHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	logger.WithFields(logrus.Fields{"host": r.Host, "path": r.URL.Path, "method": r.Method}).Debug("got request")
+	lh.inner.ServeHTTP(w, r)
 }
 
 // work around time.Duration's lack of UnmarshalText
