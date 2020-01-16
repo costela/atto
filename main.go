@@ -11,8 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/nytimes/gziphandler"
-
+	"github.com/NYTimes/gziphandler"
 	"github.com/sirupsen/logrus"
 	"github.com/stevenroose/gonfig"
 )
