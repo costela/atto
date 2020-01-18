@@ -17,6 +17,9 @@ func (sd safeDir) Open(path string) (http.File, error) {
 	dir := http.Dir(sd)
 	file, err := dir.Open(path)
 	if err != nil {
+		if os.IsNotExist(err) && conf.Path404 != "" {
+			return dir.Open(conf.Path404)
+		}
 		return nil, err
 	}
 	if conf.ShowList {

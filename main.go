@@ -23,7 +23,8 @@ var logger *logrus.Logger
 var conf = struct {
 	LogLevel string `default:"warn" short:"l" desc:"level of logging output (one of debug/info/warn/error)"`
 	Port     int    `default:"8080" desc:"port to listen on"`
-	Path     string `default:"/www" desc:"path to serve"`
+	Path     string `default:"." desc:"path to serve"`
+	Path404  string `default:"404.html" desc:"path to a file whose content will be returned on 404 (relative to --path)"`
 	Prefix   string `default:"" desc:"prefix under which atto will be accessed (this will be stripped before accessing 'path')"`
 	ShowList bool   `default:"false" desc:"whether to display folder contents"`
 	Compress bool   `default:"true" desc:"whether to transparently compress served files"`
