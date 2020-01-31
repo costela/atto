@@ -1,9 +1,10 @@
-package main // import "github.com/costela/atto"
+package main
 
 import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -38,7 +39,6 @@ func main() {
 
 	logger.WithFields(logrus.Fields{
 		"version": version,
-		"path":    conf.Path,
 	}).Info("starting atto")
 
 	handler := http.StripPrefix(conf.Prefix, http.FileServer(safeDir(conf.Path)))
@@ -47,9 +47,13 @@ func main() {
 		handler = gziphandler.GzipHandler(handler)
 	}
 
+	if conf.Canonical.Host != "" {
+		handler = canonicalRedirectMiddleware(handler.ServeHTTP)
+	}
+
 	server := http.Server{
 		Addr:              fmt.Sprintf(":%d", conf.Port),
-		Handler:           logHandler{handler},
+		Handler:           loggingMiddleware(handler.ServeHTTP),
 		ReadHeaderTimeout: time.Duration(*conf.Timeout.ReadHeader),
 		ReadTimeout:       time.Duration(*conf.Timeout.ReadHeader), // we do not expect any content upload, so headers are enough
 		ErrorLog:          log.New(logger.WithField("source", "http.Server").WriterLevel(logrus.WarnLevel), "", 0),
@@ -88,13 +92,38 @@ func main() {
 	wg.Wait()
 }
 
-type logHandler struct {
-	inner http.Handler
+func loggingMiddleware(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		h.ServeHTTP(w, r)
+		logger.WithFields(logrus.Fields{
+			"host":   r.Host,
+			"path":   r.URL.Path,
+			"method": r.Method,
+		}).Info("handled request")
+	}
 }
 
-func (lh logHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logger.WithFields(logrus.Fields{"host": r.Host, "path": r.URL.Path, "method": r.Method}).Info("incoming request")
-	lh.inner.ServeHTTP(w, r)
+func canonicalRedirectMiddleware(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		host := r.Host
+		if hostNoPort, _, err := net.SplitHostPort(r.Host); err == nil {
+			host = hostNoPort
+		}
+
+		if conf.Canonical.Host != host {
+			logger.WithFields(logrus.Fields{
+				"canonical": conf.Canonical.Host,
+			}).Debug("redirecting to canonical host")
+
+			u := r.URL
+			u.Host = conf.Canonical.Host
+
+			http.Redirect(w, r, u.String(), conf.Canonical.StatusCode)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	}
 }
 
 func handleSignals(server *http.Server) {

@@ -39,6 +39,8 @@ The following settings may be provided as command line arguments or environment 
 | `--path` | `ATTO_PATH` | path which will be served | `.` |
 | `--path404` | `ATTO_PATH` | path to a file returned when the requested content cannot be found | `404.html` |
 | `--prefix` | `ATTO_PREFIX` | prefix under which `path` will be accessed | _none_ |
+| `--canonical.host` | `ATTO_CANONICAL_HOST` | if this host (FQDN) is set, requests using different hosts will be redirected to it (e.g.: www.foo.bar to foo.bar) | _none_ |
+| `--canonical.statuscode` | `ATTO_CANONICAL_STATUSCODE` | http status code to use for the canonical host redirect | `302` (temporary) |
 | `--showlist` | `ATTO_SHOWLIST` | whether to display folder contents | `false` |
 | `--timeout.readheader` | `ATTO_TIMEOUT_READHEADER` | time to wait for request headers | `5s` |
 | `--timeout.shutdown` | `ATTO_TIMEOUT_SHUTDOWN` | time to wait for ungoing requests to finish before shutting down | `30s` |
