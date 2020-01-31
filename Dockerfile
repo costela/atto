@@ -12,7 +12,7 @@ COPY go.* /atto/
 RUN go mod download
 
 COPY *.go /atto/
-RUN go build . -ldflags "-X main.version=$(git describe --tags --dirty --always)"
+RUN go build -ldflags "-X main.version=$(git describe --tags --dirty --always)" .
 
 
 FROM busybox
