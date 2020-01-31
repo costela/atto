@@ -1,4 +1,4 @@
-FROM golang:1.11-alpine AS build
+FROM golang:1.13-alpine AS build
 
 ENV CGO_ENABLED=0
 
@@ -12,7 +12,7 @@ COPY go.* /atto/
 RUN go mod download
 
 COPY *.go /atto/
-RUN go build .
+RUN go build . -ldflags "-X main.version=$(git describe --tags --dirty --always)"
 
 
 FROM busybox
