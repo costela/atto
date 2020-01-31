@@ -12,7 +12,7 @@ type safeDir string
 func (sd safeDir) Open(path string) (http.File, error) {
 	var err error
 	defer func() {
-		logger.WithFields(logrus.Fields{"path": path, "error": err}).Info("handling request")
+		logger.WithFields(logrus.Fields{"path": path, "error": err}).Debug("handling request")
 	}()
 	dir := http.Dir(sd)
 	file, err := dir.Open(path)

@@ -39,7 +39,7 @@ func main() {
 	logger.WithFields(logrus.Fields{
 		"version": version,
 		"path":    conf.Path,
-	}).Debug("starting atto")
+	}).Info("starting atto")
 
 	handler := http.StripPrefix(conf.Prefix, http.FileServer(safeDir(conf.Path)))
 
@@ -58,7 +58,7 @@ func main() {
 	server.RegisterOnShutdown(func() {
 		logger.WithFields(logrus.Fields{
 			"timeout": time.Duration(*conf.Timeout.Shutdown),
-		}).Debug("shutting down gracefully")
+		}).Info("shutting down gracefully")
 	})
 
 	wg := sync.WaitGroup{}
@@ -93,7 +93,7 @@ type logHandler struct {
 }
 
 func (lh logHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	logger.WithFields(logrus.Fields{"host": r.Host, "path": r.URL.Path, "method": r.Method}).Debug("got request")
+	logger.WithFields(logrus.Fields{"host": r.Host, "path": r.URL.Path, "method": r.Method}).Info("incoming request")
 	lh.inner.ServeHTTP(w, r)
 }
 

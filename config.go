@@ -3,7 +3,7 @@ package main
 import "time"
 
 var conf = struct {
-	LogLevel string `default:"warn" short:"l" desc:"level of logging output (one of debug/info/warn/error)"`
+	LogLevel string `default:"info" short:"l" desc:"level of logging output (one of debug/info/warn/error)"`
 	Port     int    `default:"8080" desc:"port to listen on"`
 	Path     string `default:"." desc:"path to serve"`
 	Path404  string `default:"404.html" desc:"path to a file whose content will be returned on 404 (relative to --path)"`
