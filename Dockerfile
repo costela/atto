@@ -1,10 +1,9 @@
-FROM golang:1.13-alpine AS build
+FROM golang:1.14-alpine AS build
 
+ARG SOURCE_BRANCH
 ENV CGO_ENABLED=0
 
-RUN adduser -S atto \
- && addgroup -S atto \
- && apk --update add git
+RUN apk --no-cache add git mailcap
 
 WORKDIR /atto
 
@@ -12,14 +11,16 @@ COPY go.* /atto/
 RUN go mod download
 
 COPY *.go /atto/
-RUN go build -ldflags "-X main.version=$(git describe --tags --dirty --always)" .
 
+RUN go build -ldflags "-X main.version=${SOURCE_BRANCH}" .
 
-FROM busybox
+FROM alpine
 
+RUN adduser -S atto \
+ && addgroup -S atto 
+
+COPY --from=build /etc/mime.types /etc/
 COPY --from=build /atto/atto /atto
-COPY --from=build /etc/passwd /etc/passwd
-COPY --from=build /etc/group /etc/group
 
 USER atto
 
